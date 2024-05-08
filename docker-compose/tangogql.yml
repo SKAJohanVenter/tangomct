@@ -1,0 +1,14 @@
+version: "3"
+
+services:
+
+  tangogql:
+    image: artefact.skao.int/ska-tango-tangogql:1.3.9
+    network_mode: ${NETWORK_MODE}
+    depends_on:
+      - tangodb
+    environment:
+      - TANGO_HOST=${TANGO_HOST}
+    ports:
+      - "5004:5004"
+    restart: unless-stopped

@@ -1,0 +1,15 @@
+version: "3"
+
+services:
+
+  tangotest:
+    image: artefact.skao.int/ska-tango-images-tango-test:3.0.2
+    restart: unless-stopped
+    depends_on:
+      - databaseds
+    network_mode: ${NETWORK_MODE}
+    container_name: tangotest
+    environment:
+      - TANGO_HOST=${TANGO_HOST}
+    command:
+      test
