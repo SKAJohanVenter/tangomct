@@ -5,7 +5,6 @@
 #   - tangodb: MariaDB database with TANGO schema
 #   - dsconfig: Cofigures Tango device registration
 #   - databaseds: TANGO database device server
-#   - cli: Container with PyTango, ipython, itango, for command line access
 #
 
 volumes:
@@ -22,8 +21,7 @@ services:
       - MYSQL_DATABASE=tango
       - MYSQL_USER=tango
       - MYSQL_PASSWORD=tango
-    volumes:
-      - tangodb:/var/lib/mysql
+
 
   databaseds:
     image: artefact.skao.int/ska-tango-images-tango-databaseds:5.22.1
@@ -51,31 +49,3 @@ services:
       - -ORBendPoint
       - giop:tcp:0.0.0.0:10000
 
-  cli:
-    image: artefact.skao.int/ska-tango-images-tango-itango:9.5.0
-    restart: unless-stopped
-    depends_on:
-      - databaseds
-    network_mode: ${NETWORK_MODE}
-    container_name: cli
-    environment:
-      - TANGO_HOST=${TANGO_HOST}
-    volumes:
-      - .:/training
-    working_dir: /training
-    command: >
-      tail -F /dev/null
-
-  dsconfig:
-    image: artefact.skao.int/ska-tango-images-tango-dsconfig:1.5.13
-    network_mode: ${NETWORK_MODE}
-    container_name: dsconfig
-    depends_on:
-      - databaseds
-    environment:
-      - TANGO_HOST=${TANGO_HOST}
-    command: >
-      sh -c "wait-for-it.sh ${TANGO_HOST} --timeout=30 --strict  -- 
-          json2tango -w -a -u data/config.json && sleep infinity"
-    volumes:
-      - .:/data
