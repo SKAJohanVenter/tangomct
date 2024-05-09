@@ -60,6 +60,28 @@ query{
     }
 }
 ```
+### Subscribe to a Tango attribute
 
+Make use of a websocket client.
+
+Server location:
+
+```console
+ws://127.0.0.1:5004/socket
+```
+
+Request:
+
+```console
+{"type":"start","payload":{"query":"\nsubscription Attributes($fullNames: [String]!) {\n  attributes(fullNames: $fullNames) {\n    device\n    attribute\n    value\n    writeValue\n    timestamp\n  }\n}","variables":{"fullNames":["sys/tg_test/1/double_scalar"]}}}
+```
+Sample responses:
+
+```console
+{"type": "data", "payload": {"data": {"attributes": {"device": "sys/tg_test/1", "attribute": "double_scalar", "value": -53.224684076613265, "writeValue": 0.0, "timestamp": 1715268758.152865}}}}
+{"type": "data", "payload": {"data": {"attributes": {"device": "sys/tg_test/1", "attribute": "double_scalar", "value": -61.93129486648311, "writeValue": 0.0, "timestamp": 1715268761.160854}}}}
+{"type": "data", "payload": {"data": {"attributes": {"device": "sys/tg_test/1", "attribute": "double_scalar", "value": -66.2569646932381, "writeValue": 0.0, "timestamp": 1715268764.170845}}}}
+{"type": "data", "payload": {"data": {"attributes": {"device": "sys/tg_test/1", "attribute": "double_scalar", "value": -70.5624520407959, "writeValue": 0.0, "timestamp": 1715268767.184561}}}}
+```
 
 
