@@ -84,4 +84,45 @@ Sample responses:
 {"type": "data", "payload": {"data": {"attributes": {"device": "sys/tg_test/1", "attribute": "double_scalar", "value": -70.5624520407959, "writeValue": 0.0, "timestamp": 1715268767.184561}}}}
 ```
 
+## Install and run openMCT
 
+Follow the instructions from *[https://github.com/nasa/openmct](https://github.com/nasa/openmct)*.
+
+## Install the plugins
+
+### Update index.html
+
+Add the following lines
+
+```diff
+...
++openmct.install(openmct.plugins.TangoTree());
++openmct.install(openmct.plugins.TangoData());
+document.addEventListener('DOMContentLoaded', function () {
+  openmct.start();
+});
+...
+```
+
+### Update src/plugins/plugins.js
+```diff
+...
+import WebPagePlugin from './webPage/plugin.js';
++import TangoTreePlugin from '../../../tango_plugin/TangoTreePlugin.js';
++import TangoDataPlugin from '../../../tango_plugin/TangoDataPlugin.js';
+
+const plugins = {};
+...
++plugins.TangoTree = TangoTreePlugin;
++plugins.TangoData = TangoDataPlugin
+
+export default plugins;
+```
+
+## Run the server
+
+```console
+npm start
+```
+
+Browse to *[http://localhost:8080/](http://localhost:8080/)*

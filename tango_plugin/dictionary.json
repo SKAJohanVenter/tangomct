@@ -1,0 +1,30 @@
+{
+    "name": "LMC",
+    "key": "lmc",
+    "measurements": [
+      {
+        "name": "Test double scalar",
+        "deviceName": "sys/tg_test/1/double_scalar",
+        "key": "sys.tg_test.1.double_scalar",
+        "values": [
+          {
+            "key": "value",
+            "name": "Value",
+            "format": "float",
+            "hints": {
+              "range": 1
+            }
+          },
+          {
+            "key": "utc",
+            "source": "timestamp",
+            "name": "Timestamp",
+            "format": "utc",
+            "hints": {
+              "domain": 1
+            }
+          }
+        ]
+      }
+    ]
+  }
