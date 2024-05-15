@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Open MCT SARAO</title>
+  </head>
+  <body>
+    <script>
+      const socket = new WebSocket('ws://127.0.0.1:5004/socket')
+      socket.onmessage = function (event) {
+        const parsed_data = JSON.parse(event.data)
+        const point = {
+          value: parsed_data.payload.data.attributes.value,
+          timestamp: parsed_data.payload.data.attributes.timestamp * 1000,
+          id: 'sys.tg_test.1.double_scalar',
+        }
+        console.log(point)
+      }
+
+      socket.onopen = () => {
+        socket.send(
+          '{ "type": "start", "payload": { "query": "subscription Attributes($fullNames: [String]!) {  attributes(fullNames: $fullNames) {    device    attribute    value    writeValue    timestamp  }}", "variables": { "fullNames": ["sys/tg_test/1/double_scalar"] } } }'
+        )
+      }
+    </script>
+  </body>
+</html>

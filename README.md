@@ -1,15 +1,19 @@
 # tangomct
-Plugin for OpenMCT to  monitor a Tango Controls system
+
+Plugin for OpenMCT to monitor a Tango Controls system
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
-**Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
 - [Development](#development)
   - [Start a tango controls test environment](#start-a-tango-controls-test-environment)
-    - [Requirements](#requirements)
-    - [Add a docker network if required](#add-a-docker-network-if-required)
-    - [Bring up the environment](#bring-up-the-environment)
+  - [GraphiQL](#graphiql)
+  - [Subscribe to a Tango attribute](#subscribe-to-a-tango-attribute)
+- [Open MCT (TODO)](#open-mct-todo)
+  - [Install the plugins](#install-the-plugins)
+    - [Update index.html](#update-indexhtml)
+    - [Update src/plugins/plugins.js](#update-srcpluginspluginsjs)
+  - [Run the server](#run-the-server)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -17,76 +21,86 @@ Plugin for OpenMCT to  monitor a Tango Controls system
 
 ## Start a tango controls test environment
 
-### Requirements
-
-- docker-compose
-
-### Add a docker network if required
-
-> **_NOTE:_**
- You can chage the `.env` setting for network mode if you want to use something else
-
-```console
-docker network create tango
-```
-
-### Bring up the environment
-
-```console
+```sh
 cd docker-compose
+docker network create tango
 docker compose -f tango-db.yml  -f  tango-test.yml -f tangogql.yml  up
 ```
 
+## GraphiQL
+
 The Graphql endpoint should be available at:
-*[http://localhost:5004/graphiql/](http://localhost:5004/graphiql/)*.
+_[http://localhost:5004/graphiql/](http://localhost:5004/graphiql/)_.
 
-Query example
-
-```console
-query{
-    devices(pattern: "sys/tg_test/1") {
-      attributes(pattern: "*") {
-        name
-      }
+```gql
+# Query a device
+query {
+  devices(pattern: "sys/tg_test/1") {
+    attributes(pattern: "*") {
       name
-      state
-      connected
-      alias
-      deviceClass
-      pid
-      startedDate
-      stoppedDate
-      exported
     }
+    name
+    state
+    connected
+    alias
+    deviceClass
+    pid
+    startedDate
+    stoppedDate
+    exported
+  }
+}
+
+# .. Or explore the schema and types
+query {
+  schema: __schema {
+    types {
+      name
+    }
+  }
+
+  subscriptionFields: __type(name: "Subscription") {
+    fields {
+      name
+    }
+  }
+
+  queryFields: __type(name: "Query") {
+    fields {
+      name
+    }
+  }
 }
 ```
-### Subscribe to a Tango attribute
 
-Make use of a websocket client.
+## Subscribe to a Tango attribute
+For example, to consume the GraphQL API open a website and in the console:
 
-Server location:
+```js
+const socket = new WebSocket('ws://127.0.0.1:5004/socket')
 
-```console
-ws://127.0.0.1:5004/socket
+socket.onmessage = function (event) {
+  const parsed_data = JSON.parse(event.data)
+  const point = {
+    value: parsed_data.payload.data.attributes.value,
+    timestamp: parsed_data.payload.data.attributes.timestamp * 1000,
+    id: 'sys.tg_test.1.double_scalar',
+  }
+  console.log(point)
+}
+
+const gqlSubscriptionQuery =
+  '{ "type": "start", "payload": { "query": "subscription Attributes($fullNames: [String]!) {  attributes(fullNames: $fullNames) {    device    attribute    value    writeValue    timestamp  }}", "variables": { "fullNames": ["sys/tg_test/1/double_scalar"] } } }'
+
+socket.onopen = () => socket.send(gqlSubscriptionQuery)
+
+// You should see logs something like
+{ "value": 232.01497690132726, "timestamp": 1715785846038.907, "id": "sys.tg_test.1.double_scalar" }
 ```
 
-Request:
+# Open MCT (TODO)
 
-```console
-{"type":"start","payload":{"query":"\nsubscription Attributes($fullNames: [String]!) {\n  attributes(fullNames: $fullNames) {\n    device\n    attribute\n    value\n    writeValue\n    timestamp\n  }\n}","variables":{"fullNames":["sys/tg_test/1/double_scalar"]}}}
-```
-Sample responses:
-
-```console
-{"type": "data", "payload": {"data": {"attributes": {"device": "sys/tg_test/1", "attribute": "double_scalar", "value": -53.224684076613265, "writeValue": 0.0, "timestamp": 1715268758.152865}}}}
-{"type": "data", "payload": {"data": {"attributes": {"device": "sys/tg_test/1", "attribute": "double_scalar", "value": -61.93129486648311, "writeValue": 0.0, "timestamp": 1715268761.160854}}}}
-{"type": "data", "payload": {"data": {"attributes": {"device": "sys/tg_test/1", "attribute": "double_scalar", "value": -66.2569646932381, "writeValue": 0.0, "timestamp": 1715268764.170845}}}}
-{"type": "data", "payload": {"data": {"attributes": {"device": "sys/tg_test/1", "attribute": "double_scalar", "value": -70.5624520407959, "writeValue": 0.0, "timestamp": 1715268767.184561}}}}
-```
-
-## Install and run openMCT
-
-Follow the instructions from *[https://github.com/nasa/openmct](https://github.com/nasa/openmct)*.
+Follow the instructions from _[https://github.com/nasa/openmct](https://github.com/nasa/openmct)_.
 
 ## Install the plugins
 
@@ -105,6 +119,7 @@ document.addEventListener('DOMContentLoaded', function () {
 ```
 
 ### Update src/plugins/plugins.js
+
 ```diff
 ...
 import WebPagePlugin from './webPage/plugin.js';
@@ -125,4 +140,4 @@ export default plugins;
 npm start
 ```
 
-Browse to *[http://localhost:8080/](http://localhost:8080/)*
+Browse to _[http://localhost:8080/](http://localhost:8080/)_
