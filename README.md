@@ -30,7 +30,7 @@ docker compose -f tango-db.yml  -f  tango-test.yml -f tangogql.yml  up
 ## GraphiQL
 
 The Graphql endpoint should be available at:
-_[http://localhost:5004/graphiql/](http://localhost:5004/graphiql/)_.
+_[http://localhost:5004/db](http://localhost:5004/db)_.
 
 ```gql
 # Query a device
