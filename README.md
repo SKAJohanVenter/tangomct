@@ -77,7 +77,7 @@ query {
 For example, to consume the GraphQL API open a website and in the console:
 
 ```js
-const socket = new WebSocket('ws://127.0.0.1:5004/socket')
+const socket = new WebSocket('ws://127.0.0.1:5004/socket', "graphql-ws")
 
 socket.onmessage = function (event) {
   const parsed_data = JSON.parse(event.data)
