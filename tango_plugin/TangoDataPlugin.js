@@ -2,7 +2,7 @@ import { addMeasurement, addFolder } from './state.js';
 
 export default function(options) {
     return function(openmct) {
-        const socket = new WebSocket('ws://127.0.0.1:5004/socket');
+        const socket = new WebSocket('ws://127.0.0.1:5004/socket', 'graphql-ws');
         var listener = {};
         var subscribedTelemetries = new Set();
 
