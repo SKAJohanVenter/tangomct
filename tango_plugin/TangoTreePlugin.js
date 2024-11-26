@@ -2,36 +2,7 @@
  * Basic Realtime telemetry plugin using websockets.
  */
 
-const display_elements = {
-  name: 'LMC',
-  key: 'lmc',
-  measurements: [
-    {
-      name: 'Test double scalar',
-      deviceName: 'sys/tg_test/1/double_scalar',
-      key: 'sys.tg_test.1.double_scalar',
-      values: [
-        {
-          key: 'value',
-          name: 'Value',
-          format: 'float',
-          hints: {
-            range: 1,
-          },
-        },
-        {
-          key: 'utc',
-          source: 'timestamp',
-          name: 'Timestamp',
-          format: 'utc',
-          hints: {
-            domain: 1,
-          },
-        },
-      ],
-    },
-  ],
-}
+import { display_elements } from './state.js';
 
 function getLMCDictionary() {
   let a = new Promise(function (myResolve, myReject) {
@@ -44,48 +15,86 @@ function getLMCDictionary() {
 var LMCObjectProvider = {
   get: function (identifier) {
     return getLMCDictionary().then(function (dictionary) {
+      console.log(`Processing identifier: ${identifier.key}`);
+
       if (identifier.key === 'lmc') {
         return {
           identifier: identifier,
           name: dictionary.name,
           type: 'folder',
           location: 'ROOT',
+        };
+      } else if (identifier.key.startsWith('folder:')) {
+        // const folderName = identifier.key.split(':')[1];
+
+        const measurement = dictionary.measurements.find(m => m.key === identifier.key);
+
+        if (measurement) {
+          return {
+            identifier: identifier,
+            name: measurement.name,
+            type: 'folder',
+            location: 'example.taxonomy:lmc',
+          };
         }
+        throw new Error(`Measurement not found for key: ${identifier.key}`);
       } else {
-        var measurement = dictionary.measurements.filter(function (m) {
-          return m.key === identifier.key
-        })[0]
-        return {
-          identifier: identifier,
-          name: measurement.name,
-          type: 'example.telemetry',
-          telemetry: {
-            values: measurement.values,
-          },
-          location: 'example.taxonomy:lmc',
+        // Attributes (telemetry points)
+        console.log(dictionary.measurements)
+        console.log("Looking up identifier:", identifier);
+        const measurement = dictionary.measurements.find(m => m.key === identifier.key);
+        if (measurement) {
+          console.log("Found measurement: ", measurement)
+          return {
+              identifier: identifier,
+              deviceName: measurement.deviceName,
+              name: measurement.name,
+              type: 'example.telemetry',
+              telemetry: {
+                  values: measurement.values,
+              },
+              location: measurement.location,
+          };
         }
-      }
+        throw new Error(`Measurement not found for key: ${identifier.key}`);
+    }
     })
   },
 }
 
 var compositionProvider = {
   appliesTo: function (domainObject) {
-    return (
-      domainObject.identifier.namespace === 'example.taxonomy' && domainObject.type === 'folder'
-    )
+      return (
+          domainObject.identifier.namespace === 'example.taxonomy' &&
+          domainObject.type === 'folder'
+      );
   },
   load: function (domainObject) {
-    return getLMCDictionary().then(function (dictionary) {
-      return dictionary.measurements.map(function (m) {
-        return {
-          namespace: 'example.taxonomy',
-          key: m.key,
+      return getLMCDictionary().then(function (dictionary) {
+        let children = [];
+        if (domainObject.identifier.key === 'lmc') {
+            // Return all device folders
+            return dictionary.measurements
+                .filter(m => m.type === 'folder') // Ensure we only include folders
+                .map(m => ({
+                    namespace: 'example.taxonomy',
+                    key: m.key,
+                }));
+        } else if (domainObject.identifier.key.startsWith('folder:')) {
+            // Return telemetry points under the specific folder
+            return dictionary.measurements
+                .filter(m => m.location === domainObject.identifier.key)
+                .map(m => ({
+                    namespace: 'example.taxonomy',
+                    key: m.key,
+                }));
         }
-      })
-    })
+        console.log(`Children for ${domainObject.identifier.key}:`, children);
+        return children;
+      });
   },
-}
+};
+
 
 export default function (options) {
   return function (openmct) {
@@ -96,9 +105,20 @@ export default function (options) {
     openmct.objects.addProvider('example.taxonomy', LMCObjectProvider)
     openmct.composition.addProvider(compositionProvider)
     openmct.types.addType('example.telemetry', {
-      name: 'Example Telemetry Point',
-      description: 'Example telemetry point from our happy tutorial.',
+      name: 'Telemetry Point',
+      description: 'Telemetry point.',
       cssClass: 'icon-telemetry',
+      columns: [
+        {
+          key: "value",
+          expandable: true
+        }
+      ]
     })
+    openmct.types.addType('folder', {
+      name: 'Folder',
+      description: 'A container for organizing objects.',
+      cssClass: 'icon-folder',
+    });
   }
 }
