@@ -17,7 +17,7 @@ var LMCObjectProvider = {
     return getLMCDictionary().then(function (dictionary) {
       console.log(`Processing identifier: ${identifier.key}`);
 
-      if (identifier.key === 'lmc') {
+      if (identifier.key === 'devices') {
         return {
           identifier: identifier,
           name: dictionary.name,
@@ -34,7 +34,7 @@ var LMCObjectProvider = {
             identifier: identifier,
             name: measurement.name,
             type: 'folder',
-            location: 'example.taxonomy:lmc',
+            location: 'example.taxonomy:devices',
           };
         }
         throw new Error(`Measurement not found for key: ${identifier.key}`);
@@ -72,7 +72,7 @@ var compositionProvider = {
   load: function (domainObject) {
       return getLMCDictionary().then(function (dictionary) {
         let children = [];
-        if (domainObject.identifier.key === 'lmc') {
+        if (domainObject.identifier.key === 'devices') {
             // Return all device folders
             return dictionary.measurements
                 .filter(m => m.type === 'folder') // Ensure we only include folders
@@ -100,7 +100,7 @@ export default function (options) {
   return function (openmct) {
     openmct.objects.addRoot({
       namespace: 'example.taxonomy',
-      key: 'lmc',
+      key: 'devices',
     })
     openmct.objects.addProvider('example.taxonomy', LMCObjectProvider)
     openmct.composition.addProvider(compositionProvider)

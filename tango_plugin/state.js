@@ -1,6 +1,6 @@
 export const display_elements = {
-    name: 'LMC',
-    key: 'lmc',
+    name: 'Tango Devices',
+    key: 'devices',
     measurements: [],
 };
 

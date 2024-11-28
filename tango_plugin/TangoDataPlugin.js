@@ -45,7 +45,7 @@ export default function(options) {
                         const deviceFolderKey = `folder:${dotDeviceName}`;
 
                         console.log("Adding measurement: " + device.name)
-                        addFolder(deviceFolderKey, device.name, "lmc")
+                        addFolder(deviceFolderKey, device.name, "devices")
 
                         device.attributes.forEach(attr => {
                             const attrName = `${device.name}/${attr.name}`;
