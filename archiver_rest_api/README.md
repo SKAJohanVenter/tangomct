@@ -13,15 +13,21 @@
 
 Use [Postgrest](https://docs.postgrest.org/en/v12/) to expose a REST interface to the tables
 
-- ```docker run --rm --net=host \
+```
+docker run --rm --net=host \
   -e PGRST_DB_URI="postgres://<username:password>@localhost/hdb" \
-  postgrest/postgrest```
+  postgrest/postgrest
+```
 
 ## Docker Compose
 
 You can deploy HDBPP, Postgrest Swagger from docker compose
 
-- `cd docker-compose`
-- `docker compose -f hdbpp.yml -f postgrest.yml -f swagger.yml`
+```
+cd docker-compose
+docker compose -f hdbpp.yml -f postgrest.yml -f swagger.yml
+```
 
-Swagger interface available at: http://localhost:8080/
+- Swagger interface available at: http://localhost:8080/
+- Postgrest available at: http://localhost:3000/
+
