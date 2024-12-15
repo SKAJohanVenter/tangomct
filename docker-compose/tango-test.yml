@@ -1,6 +1,7 @@
 services:
 
   tangotest:
+    platform: linux/amd64
     image: artefact.skao.int/ska-tango-images-tango-test:3.0.2
     restart: unless-stopped
     depends_on:

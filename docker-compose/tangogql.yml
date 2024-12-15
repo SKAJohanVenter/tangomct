@@ -1,6 +1,7 @@
 services:
 
   tangogql:
+    platform: linux/amd64
     image: artefact.skao.int/ska-tango-tangogql-ariadne:0.1.1
     network_mode: ${NETWORK_MODE}
     depends_on:

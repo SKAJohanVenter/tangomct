@@ -1,0 +1,19 @@
+# THIS IS NOT SUITABLE FOR PRODUCTION
+version: '3'
+services:
+  postgrest:
+    hostname: postgrest
+    image: postgrest/postgrest
+    ports:
+      - "3000:3000"
+    expose:
+      - "3000"
+    environment:
+      PGRST_DB_URI: postgres://rest_user:password@hdbpp:5432/hdb
+      PGRST_OPENAPI_SERVER_PROXY_URI: http://0.0.0.0:3000
+      PGRST_SERVER_CORS_ALLOWED_ORIGINS: ""
+      PGRST_SERVER_HOST: "*"
+      PGRST_DB_ANON_ROLE: "web_anon"
+    depends_on:
+      - hdbpp
+    network_mode: ${NETWORK_MODE}

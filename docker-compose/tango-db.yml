@@ -13,6 +13,7 @@ volumes:
 
 services:
   tangodb:
+    platform: linux/amd64
     image: artefact.skao.int/ska-tango-images-tango-db:11.0.2
     restart: unless-stopped
     network_mode: ${NETWORK_MODE}
@@ -26,6 +27,7 @@ services:
       - tangodb:/var/lib/mysql
 
   databaseds:
+    platform: linux/amd64
     image: artefact.skao.int/ska-tango-images-tango-databaseds:5.22.1
     restart: unless-stopped
     depends_on:
@@ -52,6 +54,7 @@ services:
       - giop:tcp:0.0.0.0:10000
 
   cli:
+    platform: linux/amd64
     image: artefact.skao.int/ska-tango-images-tango-itango:9.5.0
     restart: unless-stopped
     depends_on:
@@ -67,6 +70,7 @@ services:
       tail -F /dev/null
 
   dsconfig:
+    platform: linux/amd64
     image: artefact.skao.int/ska-tango-images-tango-dsconfig:1.5.13
     network_mode: ${NETWORK_MODE}
     container_name: dsconfig
