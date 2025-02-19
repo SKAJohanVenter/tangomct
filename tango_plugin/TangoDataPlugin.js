@@ -150,15 +150,46 @@ export default function(options) {
                 return domainObject.type === 'example.telemetry';
             },
             request: function (domainObject, options) {
-                console.log('Requesting historical data for:', domainObject.identifier.key);
+                const attName = domainObject.identifier.key;
+                const postgrestUrl = "http://0.0.0.0:3000";
 
-                // empty historical data at the moment so no error is thrown complaining
-                // about no provider existing
-                const historicalData = {
-                    values: [],
-                };
+                console.log('Requesting historical data for:', attName);
 
-                return Promise.resolve(historicalData);
+                // example options:
+                // Object { size: 628, strategy: "minmax", filters: undefined, domain: "utc",
+                //  start: 1739951708781, end: 1739953538781 ... }
+                // console.log(options)
+
+                return fetch(`${postgrestUrl}/att_conf?att_name=eq.${encodeURIComponent(attName)}`, {
+                    method: "GET",
+                    headers: { "Accept": "application/json" }
+                })
+                .then(response => {
+                    if (!response.ok) throw new Error(`Failed to fetch att_conf: ${response.statusText}`);
+                    return response.json();
+                })
+                .then(attConfData => {
+                    if (attConfData.length === 0) throw new Error(`Attribute ${attName} not found in att_conf`);
+            
+                    // Extract table name from att_conf response
+                    const tableName = attConfData[0].table_name;
+            
+                    // Step 2: Query the correct table for historical values
+                    const query = new URLSearchParams({
+                        "att_conf_id": attConfData[0].att_conf_id, // Ensures we're filtering by attribute ID
+                        "timestamp=gte": startTime,
+                        "timestamp=lte": endTime,
+                        "order": "timestamp.asc"
+                    });
+            
+                    return fetch(`${postgrestUrl}/${tableName}?${query.toString()}`, {
+                        method: "GET",
+                        headers: { "Accept": "application/json" }
+                    });
+                })
+                .then(response => {
+                    return { values: [] };
+                })
             },
             supportsSubscribe: function(domainObject) {
                 return domainObject.type === 'example.telemetry';
