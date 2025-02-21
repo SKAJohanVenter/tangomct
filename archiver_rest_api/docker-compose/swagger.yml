@@ -4,9 +4,9 @@ services:
   swagger:
     image: swaggerapi/swagger-ui
     ports:
-      - "8080:8080"
+      - "8181:8080"
     expose:
-      - "8080"
+      - "8181"
     environment:
       SWAGGER_JSON_URL: http://0.0.0.0:3000
     network_mode: ${NETWORK_MODE}

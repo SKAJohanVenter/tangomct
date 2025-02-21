@@ -2,9 +2,13 @@ import { addMeasurement, addFolder } from './state.js';
 
 export default function(options) {
     return function(openmct) {
+        const postgrestUrl = "http://0.0.0.0:3000";
         const socket = new WebSocket('ws://127.0.0.1:5004/socket', 'graphql-ws');
+
         var listener = {};
         var subscribedTelemetries = new Set();
+        var tangoHost = "poep";
+        // var tangoHost = "databaseds:10000";
 
         socket.onopen = () => {
             socket.send(JSON.stringify({
@@ -12,6 +16,7 @@ export default function(options) {
                 payload: {
                     query: `
                         query {
+                            tangoHost
                             devices {
                                 name
                                 attributes {
@@ -35,6 +40,11 @@ export default function(options) {
 
         socket.onmessage = function(event) {
             var parsedData = JSON.parse(event.data);
+
+            // Handle initial tangoHost response message
+            if (parsedData.payload && parsedData.payload.data && parsedData.payload.data.tangoHost) {
+                tangoHost = parsedData.payload.data.tangoHost
+            }
 
             // Handle initial device and attributes response message
             if (parsedData.payload && parsedData.payload.data && parsedData.payload.data.devices) {
@@ -150,8 +160,8 @@ export default function(options) {
                 return domainObject.type === 'example.telemetry';
             },
             request: function (domainObject, options) {
-                const attName = domainObject.identifier.key;
-                const postgrestUrl = "http://0.0.0.0:3000";
+                const att_formatted = domainObject.identifier.key.replaceAll(".", "/")
+                const attName = "tango://" + tangoHost + "/" + att_formatted;
 
                 console.log('Requesting historical data for:', attName);
 
@@ -173,14 +183,18 @@ export default function(options) {
             
                     // Extract table name from att_conf response
                     const tableName = attConfData[0].table_name;
+
+                    const startTime = new Date(options.start).toISOString();
+                    const endTime = new Date(options.end).toISOString();
             
-                    // Step 2: Query the correct table for historical values
+                    // Query the correct table for historical values
                     const query = new URLSearchParams({
-                        "att_conf_id": attConfData[0].att_conf_id, // Ensures we're filtering by attribute ID
-                        "timestamp=gte": startTime,
-                        "timestamp=lte": endTime,
-                        "order": "timestamp.asc"
+                        "att_conf_id": "eq." + attConfData[0].att_conf_id,
+                        "and": `(data_time.gte.${startTime},data_time.lte.${endTime})`,
+                        "order": "data_time.asc"
                     });
+
+                    console.log(`${postgrestUrl}/${tableName}?${query.toString()}`)
             
                     return fetch(`${postgrestUrl}/${tableName}?${query.toString()}`, {
                         method: "GET",
@@ -188,8 +202,32 @@ export default function(options) {
                     });
                 })
                 .then(response => {
-                    return { values: [] };
+                    if (!response.ok) throw new Error(`Failed to fetch historical data: ${response.statusText}`);
+                    return response.json();
                 })
+                .then(data => {
+                    data.forEach((row, index, arr) => {
+                        var point = {};
+                        point["value"] = row.value_r;
+
+                        if (Array.isArray(point["value"])) {
+                            point["value"] = point["value"].toString();
+                        }
+
+                        point["timestamp"] = new Date(row.data_time).getTime();
+
+                        point["id"] = domainObject.identifier.key;
+
+                        if (listener[point["id"]]) {
+                            listener[point["id"]](point);
+                        }
+                    })
+                    return {};
+                })
+                .catch(error => {
+                    console.error("Error fetching historical data:", error);
+                    return {};
+                });
             },
             supportsSubscribe: function(domainObject) {
                 return domainObject.type === 'example.telemetry';

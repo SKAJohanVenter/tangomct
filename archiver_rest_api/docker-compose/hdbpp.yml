@@ -10,6 +10,5 @@ services:
       POSTGRES_PASSWORD: password
     network_mode: ${NETWORK_MODE}
     volumes:
-      - ./db_setup.sql:/docker-entrypoint-initdb.d/999_user_setup.sql
-      - ./schema_dump.sql:/docker-entrypoint-initdb.d/1000_restore_schema_dump.sql
-      - ./data_dump.sql:/docker-entrypoint-initdb.d/1001_restore_data_dump.sql
+      - ./db_setup.sql:/docker-entrypoint-initdb.d/990_user_setup.sql
+      - ./insert_tango_device_data.sql:/docker-entrypoint-initdb.d/991_insert_tango_device_data.sql
