@@ -140,7 +140,6 @@ These steps will start up the Database, set it up and load random data over the 
 
 
 ```sh
-cd archiver_rest_api
 cd docker-compose
 docker network create tango
 docker compose -f hdbpp.yml  -f postgrest.yml -f swagger.yml  up
@@ -149,8 +148,9 @@ docker compose -f hdbpp.yml  -f postgrest.yml -f swagger.yml  up
 ## Setup to view archived and live attributes
 
 ```sh
+cd docker-compose
 docker network create tango
-docker compose -f docker-compose/tango-db.yml -f docker-compose/tango-test.yml -f docker-compose/tangogql.yml -f archiver_rest_api/docker-compose/hdbpp.yml -f archiver_rest_api/docker-compose/postgrest.yml -f archiver_rest_api/docker-compose/swagger.yml up
+docker compose -f tango-db.yml -f tango-test.yml -f tangogql.yml -f hdbpp.yml -f postgrest.yml -f swagger.yml up
 ```
 
 ## Ports
