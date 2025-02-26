@@ -5,6 +5,9 @@ This project is a proof of concept that shows how Open MCT can be used to view l
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 
+- [Recordings](#recordings)
+  - [Live data](#live-data)
+  - [Archived data from hdbpp](#archived-data-from-hdbpp)
 - [Design](#design)
   - [The design is split into two parts](#the-design-is-split-into-two-parts)
     - [Archived data](#archived-data)
@@ -24,12 +27,22 @@ This project is a proof of concept that shows how Open MCT can be used to view l
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
+# Recordings
+
+## Live data
+
+![Live data](docs/tangomct_live.gif)
+
+## Archived data from hdbpp
+
+![Archived data](docs/tangomct_archived.gif)
+
 # Design
 
 ```mermaid
 flowchart TD
     A[Tango Controls] -->B(GraphiQL)
-    A[Tango Controls] -->C[(Tango EDA)]
+    A[Tango Controls] -->C[(Tango hdbpp)]
     C<-->D[PostgREST]
     D<-->|REST interface|E
     B<-->|Websocket|E
@@ -42,7 +55,7 @@ flowchart TD
 
 ### Archived data
 
-PostgREST is used to provide a REST interface into the Tango EDA. This interface is then registered as an Open MCT data source. This data source can then be queried by time and displayed.
+PostgREST is used to provide a REST interface into the Tango hdbpp. This interface is then registered as an Open MCT data source. This data source can then be queried by time and displayed.
 
 ### Live attributes
 
