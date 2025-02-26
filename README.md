@@ -1,6 +1,6 @@
-# Tango Controls and OpenMCT
+# Tango Controls and Open MCT
 
-This project is a proof of concept that shows how OpenMCT can be used to view live and archived Tango attributes using its feature rich, extensible data visualization framework
+This project is a proof of concept that shows how Open MCT can be used to view live and archived Tango attributes using its feature rich, extensible data visualization framework
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
@@ -14,6 +14,8 @@ This project is a proof of concept that shows how OpenMCT can be used to view li
     - [GraphiQL](#graphiql)
     - [Subscribe to a Tango attribute](#subscribe-to-a-tango-attribute)
   - [Setup to view archived attributes](#setup-to-view-archived-attributes)
+  - [Setup to view archived and live attributes](#setup-to-view-archived-and-live-attributes)
+  - [Ports](#ports)
 - [Open MCT setup](#open-mct-setup)
   - [Install the plugins](#install-the-plugins)
     - [Update index.html](#update-indexhtml)
@@ -31,7 +33,7 @@ flowchart TD
     C<-->D[PostgREST]
     D<-->|REST interface|E
     B<-->|Websocket|E
-    E[Open MCT Data Sources]<-->F[OpenMCT]
+    E[Open MCT Data Sources]<-->F[Open MCT]
 ```
 
 ## The design is split into two parts
@@ -141,6 +143,28 @@ cd docker-compose
 docker network create tango
 docker compose -f hdbpp.yml  -f postgrest.yml -f swagger.yml  up
 ```
+
+## Setup to view archived and live attributes
+
+```sh
+docker network create tango
+docker compose -f docker-compose/tango-db.yml -f docker-compose/tango-test.yml -f docker-compose/tangogql.yml -f archiver_rest_api/docker-compose/hdbpp.yml -f archiver_rest_api/docker-compose/postgrest.yml -f archiver_rest_api/docker-compose/swagger.yml up
+```
+
+## Ports
+
+Depending on the deployment the following ports will be opened:
+
+- Database (Postgres)
+  - 5432
+- PostgREST (REST interface into the database)
+  - 3000
+- Swagger
+  - 8081
+- TANGO_HOST
+  - 10000
+- TangoGQL
+  - 5004
 
 # Open MCT setup
 
