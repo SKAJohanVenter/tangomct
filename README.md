@@ -1,15 +1,20 @@
 # Tango Controls and OpenMCT
 
-## This project is a proof of concept that shows how OpenMCT can be used to view live and archived Tango attributes using its feature rich, extensible data visualization framework
+This project is a proof of concept that shows how OpenMCT can be used to view live and archived Tango attributes using its feature rich, extensible data visualization framework
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 
+- [Design](#design)
+  - [The design is split into two parts](#the-design-is-split-into-two-parts)
+    - [Archived data](#archived-data)
+    - [Live attributes](#live-attributes)
 - [Development](#development)
-  - [Start a tango controls test environment](#start-a-tango-controls-test-environment)
-  - [GraphiQL](#graphiql)
-  - [Subscribe to a Tango attribute](#subscribe-to-a-tango-attribute)
-- [Open MCT (TODO)](#open-mct-todo)
+  - [Setup to view live attributes](#setup-to-view-live-attributes)
+    - [GraphiQL](#graphiql)
+    - [Subscribe to a Tango attribute](#subscribe-to-a-tango-attribute)
+  - [Setup to view archived attributes](#setup-to-view-archived-attributes)
+- [Open MCT setup](#open-mct-setup)
   - [Install the plugins](#install-the-plugins)
     - [Update index.html](#update-indexhtml)
     - [Update src/plugins/plugins.js](#update-srcpluginspluginsjs)
@@ -31,11 +36,13 @@ flowchart TD
 
 ## The design is split into two parts
 
-- Archived data
-  - PostgREST is used to provide a REST interface into the Tango EDA. This interface is then registered as an Open MCT data source. This data source can then be queried by time and displayed.
+### Archived data
 
-- Live attributes
-  - GraphiQL subscriptions are used to subscribe to attributes and registered as an Open MCT data source.
+PostgREST is used to provide a REST interface into the Tango EDA. This interface is then registered as an Open MCT data source. This data source can then be queried by time and displayed.
+
+### Live attributes
+
+GraphiQL subscriptions are used to subscribe to attributes and registered as an Open MCT data source.
 
 # Development
 
