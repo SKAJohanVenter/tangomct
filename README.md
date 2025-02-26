@@ -8,6 +8,7 @@ This project is a proof of concept that shows how Open MCT can be used to view l
 - [Recordings](#recordings)
   - [Live data](#live-data)
   - [Archived data from hdbpp](#archived-data-from-hdbpp)
+- [TODO](#todo)
 - [Design](#design)
   - [The design is split into two parts](#the-design-is-split-into-two-parts)
     - [Archived data](#archived-data)
@@ -36,6 +37,10 @@ This project is a proof of concept that shows how Open MCT can be used to view l
 ## Archived data from hdbpp
 
 ![Archived data](docs/tangomct_archived.gif)
+
+# TODO
+
+Only numeric scalars and strings are supported currently.
 
 # Design
 
