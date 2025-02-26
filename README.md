@@ -1,6 +1,6 @@
-# tangomct
+# Tango Controls and OpenMCT
 
-Plugin for OpenMCT to monitor a Tango Controls system
+## This project is a proof of concept that shows how OpenMCT can be used to view live and archived Tango attributes using its feature rich, extensible data visualization framework
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
@@ -17,9 +17,29 @@ Plugin for OpenMCT to monitor a Tango Controls system
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
+# Design
+
+```mermaid
+flowchart TD
+    A[Tango Controls] -->B(GraphiQL)
+    A[Tango Controls] -->C[(Tango EDA)]
+    C<-->D[PostgREST]
+    D<-->|REST interface|E
+    B<-->|Websocket|E
+    E[Open MCT Data Sources]<-->F[OpenMCT]
+```
+
+## The design is split into two parts
+
+- Archived data
+  - PostgREST is used to provide a REST interface into the Tango EDA. This interface is then registered as an Open MCT data source. This data source can then be queried by time and displayed.
+
+- Live attributes
+  - GraphiQL subscriptions are used to subscribe to attributes and registered as an Open MCT data source.
+
 # Development
 
-## Start a tango controls test environment
+## Setup to view live attributes
 
 ```sh
 cd docker-compose
@@ -27,7 +47,7 @@ docker network create tango
 docker compose -f tango-db.yml  -f  tango-test.yml -f tangogql.yml  up
 ```
 
-## GraphiQL
+### GraphiQL
 
 The Graphql endpoint should be available at:
 _[http://localhost:5004/db](http://localhost:5004/db)_.
@@ -73,7 +93,8 @@ query {
 }
 ```
 
-## Subscribe to a Tango attribute
+### Subscribe to a Tango attribute
+
 For example, to consume the GraphQL API open a website and in the console:
 
 ```js
@@ -98,7 +119,23 @@ socket.onopen = () => socket.send(gqlSubscriptionQuery)
 { "value": 232.01497690132726, "timestamp": 1715785846038.907, "id": "sys.tg_test.1.double_scalar" }
 ```
 
-# Open MCT (TODO)
+## Setup to view archived attributes
+
+These steps will start up the Database, set it up and load random data over the last month for:
+- `sys/tg_test/1`
+  - `att_scalar_devshort`
+  - `att_scalar_devdouble`
+  - `att_scalar_devfloat`
+
+
+```sh
+cd archiver_rest_api
+cd docker-compose
+docker network create tango
+docker compose -f hdbpp.yml  -f postgrest.yml -f swagger.yml  up
+```
+
+# Open MCT setup
 
 Follow the instructions from _[https://github.com/nasa/openmct](https://github.com/nasa/openmct)_.
 
