@@ -41,8 +41,9 @@ This project is a proof of concept that shows how Open MCT can be used to view l
 # Caveat
 
 - Only numeric scalars can be graphed
-- Enums and arrays are converted to string and displayed in the data table
-- Images are not supported
+- Arrays are converted to string and displayed in the data table
+- Enums are supported
+- Images are _not_ supported
 
 # Design
 
