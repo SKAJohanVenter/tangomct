@@ -55,11 +55,11 @@ flowchart TD
 
 ### Archived data
 
-PostgREST is used to provide a REST interface into the Tango hdbpp. This interface is then registered as an Open MCT data source. This data source can then be queried by time and displayed.
+PostgREST is used to provide a REST interface into the Tango hdbpp. This interface is then registered as an Open MCT data provider. This data provider can then be queried by time and displayed.
 
 ### Live attributes
 
-GraphiQL subscriptions are used to subscribe to attributes and registered as an Open MCT data source.
+GraphiQL subscriptions are used to subscribe to attributes and registered as an Open MCT data provider.
 
 # Development
 
