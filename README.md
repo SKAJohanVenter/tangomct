@@ -33,7 +33,9 @@ flowchart TD
     C<-->D[PostgREST]
     D<-->|REST interface|E
     B<-->|Websocket|E
-    E[Open MCT Data Sources]<-->F[Open MCT]
+    subgraph openmct ["Open MCT"]
+    E@{ shape: das, label: "Data Sources"}<-->F[Visualization]
+    end
 ```
 
 ## The design is split into two parts
