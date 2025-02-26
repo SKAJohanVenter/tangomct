@@ -38,9 +38,11 @@ This project is a proof of concept that shows how Open MCT can be used to view l
 
 ![Archived data](docs/tangomct_archived.gif)
 
-# TODO
+# Caveat
 
-Only numeric scalars and strings are supported currently.
+- Only numeric scalars can be graphed
+- Enums and arrays are converted to string and displayed in the data table
+- Images are not supported
 
 # Design
 
